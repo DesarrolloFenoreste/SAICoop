@@ -1,0 +1,1616 @@
+package com.saicoop.modelo.webService;
+//cambio leve
+
+//catalogo
+import com.saicoop.modelo.ejb.faSe.catalogo.BancosService;
+import com.saicoop.modelo.ejb.faSe.catalogo.ChequerasService;
+import com.saicoop.modelo.ejb.faSe.catalogo.ColoniasService;
+import com.saicoop.modelo.ejb.faSe.catalogo.EstadosService;
+import com.saicoop.modelo.ejb.faSe.catalogo.SectoresService;
+import com.saicoop.modelo.dto.catalogo.BancosDTO;
+import com.saicoop.modelo.dto.catalogo.ColoniasDTO;
+import com.saicoop.modelo.dto.catalogo.ChequerasDTO;
+import com.saicoop.modelo.dto.catalogo.EstadosDTO;
+import com.saicoop.modelo.dto.catalogo.SectoresDTO;
+import com.saicoop.modelo.dto.catalogo.MunicipiosDTO;
+import com.saicoop.modelo.ejb.faSe.catalogo.FinalidadesService;
+import com.saicoop.modelo.ejb.faSe.socio.GruposService;
+import com.saicoop.modelo.dto.catalogo.FinalidadesDTO;
+import com.saicoop.modelo.ejb.faSe.catalogo.MunicipiosService;
+import com.saicoop.modelo.dto.socio.GruposDTO;
+/*general*/
+import com.saicoop.modelo.ejb.faSe.general.UgruposService;
+import com.saicoop.modelo.ejb.faSe.general.UsuariosService;
+import com.saicoop.modelo.ejb.faSe.general.UsuariospermisosService;
+import com.saicoop.modelo.ejb.faSe.general.UsuariosugruposService;
+import com.saicoop.modelo.ejb.faSe.general.ProductosService;
+/*huella digital*/
+import com.saicoop.modelo.ejb.faSe.general.HuellasDpUsuarioService;
+import com.saicoop.modelo.ejb.faSe.socio.HuellasDpDService;
+import com.saicoop.modelo.ejb.faSe.socio.HuellasDpService;
+import com.saicoop.modelo.ejb.faSe.util.HuellasColaGuardadoService;
+import com.saicoop.modelo.ejb.faSe.general.HuellaDigitalService;
+/*util*/
+import com.saicoop.modelo.ejb.faSe.util.OrigenesService;
+import com.saicoop.modelo.ejb.faSe.util.PolizasService;
+import com.saicoop.modelo.ejb.faSe.util.QperfilesService;
+import com.saicoop.modelo.ejb.faSe.util.QuerysService;
+import com.saicoop.modelo.ejb.faSe.util.ReportesService;
+import com.saicoop.modelo.ejb.faSe.util.CuentasService;
+import com.saicoop.modelo.ejb.faSe.util.TablasService;
+import com.saicoop.modelo.ejb.faSe.util.TemporalService;
+import com.saicoop.modelo.ejb.faSe.util.SaiFuncionesService;
+/*socio*/
+import com.saicoop.modelo.ejb.faSe.socio.PersonasService;
+import com.saicoop.modelo.ejb.faSe.socio.AuxiliaresDService;
+import com.saicoop.modelo.ejb.faSe.socio.AuxiliaresService;
+/*control de sesion*/
+import com.saicoop.modelo.ejb.faSe.general.AdminSesionService;
+import com.saicoop.modelo.ejb.util.DatosConexion;
+/*otro*/
+import com.saicoop.modelo.ejb.util.Intermediario;
+/**/
+import com.saicoop.modelo.conexion.DTOGral;
+import java.math.BigDecimal;
+import com.saicoop.modelo.dto.util.OrigenesDTO;
+import com.saicoop.modelo.dto.util.PolizasDTO;
+import com.saicoop.modelo.dto.util.QperfilesDTO;
+import com.saicoop.modelo.dto.util.QueryDTO;
+import com.saicoop.modelo.dto.util.ReportecrDTO;
+import com.saicoop.modelo.dto.general.ProductosDTO;
+import com.saicoop.modelo.dto.util.HuellasColaGuardadoDTO;
+import com.saicoop.modelo.dto.socio.PersonasDTO;
+import com.saicoop.modelo.dto.general.AdminSesionDTO;
+import com.saicoop.modelo.dto.general.UgruposDTO;
+import com.saicoop.modelo.dto.general.UsuariosDTO;
+import com.saicoop.modelo.dto.general.UsuariospermisosDTO;
+import com.saicoop.modelo.dto.general.UsuariosugruposDTO;
+import com.saicoop.modelo.dto.socio.AuxiliaresDDTO;
+import com.saicoop.modelo.dto.socio.AuxiliaresDTO;
+import com.saicoop.modelo.dto.util.CuentasDTO;
+import com.saicoop.modelo.dto.util.TablasDTO;
+import com.saicoop.modelo.dto.util.TemporalDTO;
+import com.saicoop.modelo.dto.general.HuellasDpUsuarioDTO;
+import com.saicoop.modelo.dto.socio.HuellasDpDTO;
+import java.util.Date;
+import com.saicoop.modelo.ejb.util.ListaIpValida;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import javax.annotation.Resource;
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
+import javax.jws.WebMethod;
+import javax.jws.WebParam;
+import javax.jws.WebService;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import javax.xml.ws.WebServiceContext;
+import javax.xml.ws.handler.MessageContext;
+
+/**
+ *
+ * @author prometeo
+ */
+@WebService(serviceName = "SAICoop")
+@Stateless
+public class SAICoop {
+
+    /*catalogos*/
+    @EJB
+    private MunicipiosService municipiosService;
+    @EJB
+    private GruposService gruposService;
+    @EJB
+    private FinalidadesService finalidadesService;
+    @EJB
+    private EstadosService estadosService;
+    @EJB
+    private ColoniasService coloniasService;
+    @EJB
+    private ChequerasService chequerasService;
+    @EJB
+    private BancosService bancosService;
+    @EJB
+    private SectoresService sectoresService;
+    /*general*/
+    @EJB
+    private UsuariosugruposService usuariosugruposService;
+    @EJB
+    private UgruposService ugruposService;
+    @EJB
+    private UsuariosService usuariosService;
+    @EJB
+    private UsuariospermisosService usuariospermisosService;
+    @EJB
+    private ProductosService productosService;
+    /*huella digital*/
+    @EJB
+    private HuellasDpUsuarioService huellasDpUsuarioService;
+    @EJB
+    private HuellasDpService huellasDpService;
+    @EJB
+    private HuellasDpDService huellasDpDService;
+    @EJB
+    private HuellasColaGuardadoService huellasColaGuardadoService;
+    @EJB
+    private HuellaDigitalService huellaDigitalService;
+    /*util*/
+    @EJB
+    private CuentasService cuentasService;
+    @EJB
+    private QuerysService querysService;
+    @EJB
+    private QperfilesService qperfilesService;
+    @EJB
+    private ReportesService reportesService;
+    @EJB
+    private TablasService tablasService;
+    @EJB
+    private PolizasService polizasService;
+    @EJB
+    private SaiFuncionesService saiFuncionesService;
+    @EJB
+    private OrigenesService origenesService;
+    @EJB
+    private TemporalService temporalService;
+    /*socio*/
+    @EJB
+    private AuxiliaresService auxiliaresService;
+    @EJB
+    private AuxiliaresDService auxiliaresDService;
+    @EJB
+    private PersonasService personasService;
+    /*control de sesion*/
+    @EJB
+    private AdminSesionService adminSesionService;
+    @EJB
+    private DatosConexion datosConexion;
+    /*otro*/
+    @EJB
+    private Intermediario intermediario;
+
+    /**
+     *
+     *
+     *
+     *
+     * HUELLA DIGITAL*
+     *
+     *
+     *
+     *
+     */
+    @WebMethod(operationName = "getgetnum")
+    public int getgetnum(@WebParam(name = "num") int num) {
+        return num;
+    }
+
+    @WebMethod(operationName = "huellasDPusuario")
+    public HuellasDpUsuarioDTO huellasDPusuario(@WebParam(name = "idusuario") int idusuario,
+            @WebParam(name = "formatoHuella") int formatoHuella) {
+        if (validadorInter()) {
+            return huellaDigitalService.huellasDPusuario(idusuario, formatoHuella);
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "huellasDPsocios")
+    public List<HuellasDpDTO> huellasDPsocios(@WebParam(name = "limit") int limit,
+            @WebParam(name = "offset") int offset) {
+        if (validadorInter()) {
+            return huellaDigitalService.huellasDPsocios(limit, offset);
+        } else {
+            return null;
+        }
+    }
+
+    // Guarda la huella en imagen
+    @WebMethod(operationName = "generaImagenHuella")
+    public boolean generaImagenHuella(@WebParam(name = "imagen") byte[] imagen,
+            @WebParam(name = "asignado") String asignado,
+            @WebParam(name = "toma") int toma,
+            @WebParam(name = "carpeta") String carpeta,
+            @WebParam(name = "dedo") int dedo) {
+        if (validadorInter()) {
+            return huellaDigitalService.generaImagenHuella(imagen, asignado, toma, carpeta, dedo);
+        }
+        return false;
+    }
+
+    // Inserta la huella del socio
+    @WebMethod(operationName = "insertarHuellaSocio")
+    public void insertarHuellaSocio(
+            @WebParam(name = "idorigen") int idorigen,
+            @WebParam(name = "idgrupo") int idgrupo,
+            @WebParam(name = "idsocio") int idsocio,
+            @WebParam(name = "dedo") int dedo,
+            @WebParam(name = "huella") byte[] huella) {
+        if (validadorInter()) {
+            huellasDpService.insertarHuellaSocio(idorigen, idgrupo, idsocio, dedo, huella);
+        }
+    }
+
+    @WebMethod(operationName = "actualizarHuellaSocio")
+    public void actualizaHuellaSocio1(
+            @WebParam(name = "idorigen") int idorigen,
+            @WebParam(name = "idgrupo") int idgrupo,
+            @WebParam(name = "idsocio") int idsocio,
+            @WebParam(name = "dedo") int dedo,
+            @WebParam(name = "huella") byte[] huella) {
+        if (validadorInter()) {
+            huellasDpService.actualizaHuellaSocio(idorigen, idgrupo, idsocio, dedo, huella);
+        }
+    }
+
+    @WebMethod(operationName = "insertarDetalleHuellaSocio")
+    public void insertarDetalleHuellaSocio(
+            @WebParam(name = "idorigen") int idorigen,
+            @WebParam(name = "idgrupo") int idgrupo,
+            @WebParam(name = "idsocio") int idsocio,
+            @WebParam(name = "idusuario") int idusuario,
+            @WebParam(name = "dedo") int dedo) {
+        if (validadorInter()) {
+            huellasDpDService.insertarDetalleHuellaSocio(idorigen, idgrupo, idsocio, idusuario, dedo);
+        }
+    }
+
+    @WebMethod(operationName = "crearPoliza")//ejecuta una funcion en postgresql
+    public int crearPoliza(@WebParam(name = "param") String param) {
+        if (validadorInter()) {
+            return saiFuncionesService.creaPoliza(param);
+        } else {
+            return 0;
+        }
+    }
+
+    @WebMethod(operationName = "procesaTemporal")//ejecuta una funcion en postgresql
+    public int procesaTemporal(
+            @WebParam(name = "idusuario") int idusuario,
+            @WebParam(name = "sesion") String sesion,
+            @WebParam(name = "fecha") javax.xml.datatype.XMLGregorianCalendar fecha,
+            @WebParam(name = "origen") int origen,
+            @WebParam(name = "poliza") int poliza,
+            @WebParam(name = "tipo") int tipo,
+            @WebParam(name = "concepto") String concepto) {
+        if (validadorInter()) {
+            return saiFuncionesService.procesaTemporal(idusuario, sesion, fecha, origen, poliza, tipo, concepto);
+        } else {
+            return 0;
+        }
+    }
+
+    /**
+     *
+     *
+     *
+     *
+     * UTIL*
+     *
+     *
+     *
+     *
+     */
+    @WebMethod(operationName = "importarPolizasExtemporaneas")
+    public int importarPolizasExtemporaneas() {
+        if (validadorInter()) {
+            return saiFuncionesService.ImportarPolizasExtemporaneas();
+        } else {
+            return 0;
+        }
+    }
+
+    @WebMethod(operationName = "exportarPolizasExtemporaneas")
+    public int exportarPolizasExtemporaneas(@WebParam(name = "periodo") String periodo) {
+        if (validadorInter()) {
+            return saiFuncionesService.exportarPolizasExtemporaneas(periodo);
+        } else {
+            return 0;
+        }
+    }
+
+    @WebMethod(operationName = "buscaTodasLasCuentas")
+    public List<CuentasDTO> buscaTodasLasCuentas() {
+        if (validadorInter()) {
+            return cuentasService.buscaTodasLasCuentas();
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "buscaCuentaPorId")
+    public CuentasDTO buscaCuentaPorId(@WebParam(name = "idcuenta") String idcuenta) {
+        if (validadorInter()) {
+            return cuentasService.buscaCuentaPorId(idcuenta);
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "buscaCuentaPorIdClaseYTipo")
+    public CuentasDTO buscaCuentaPorIdClaseYTipo(@WebParam(name = "idcuenta") String idcuenta, @WebParam(name = "clase") int clase, @WebParam(name = "tipo") int tipo) {
+        if (validadorInter()) {
+            return cuentasService.buscaCuentaPorIdClaseYTipo(idcuenta, clase, tipo);
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "liquidacionMasivaDePrestamos")
+    public DTOGral liquidacionMasivaDePrestamos(
+            @WebParam(name = "cuentaContable") String cuentaContable,
+            @WebParam(name = "montoLimite") BigDecimal montoLimite,
+            @WebParam(name = "nomarch") String nomArch,
+            @WebParam(name = "idorigen") int idorigen,
+            @WebParam(name = "idProductoDeudor") String idProductoDeudor,
+            @WebParam(name = "idProductoAcredor") String idProductoAcredor,
+            @WebParam(name = "limitediasVencidos") int limitediasVencidos,
+            @WebParam(name = "limiteDiasSinMovimientos") int limiteDiasSinMovimientos,
+            @WebParam(name = "abonar") boolean abonar) {
+        if (validadorInter()) {
+            return saiFuncionesService.liquidacionMasivaDePrestamos(cuentaContable, montoLimite, nomArch, idorigen, idProductoDeudor, idProductoAcredor, limitediasVencidos, limiteDiasSinMovimientos, abonar);
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "inactivaPersonasPorGrupo")
+    public DTOGral inactivaPersonasPorGrupo(@WebParam(name = "idgrupo") int idgrupo) {
+        if (validadorInter()) {
+            return saiFuncionesService.inactivaPersonasPorGrupo(idgrupo);
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "permisos")
+    public boolean permisos(@WebParam(name = "idusuario") int idusuario, @WebParam(name = "permiso") String permiso) {
+        if (validadorInter()) {
+            return saiFuncionesService.permisos(idusuario, permiso);
+        } else {
+            return false;
+        }
+    }
+
+    @WebMethod(operationName = "condonacionMasiva")
+    public DTOGral condonacionMasiva(@WebParam(name = "idusuario") int idusuario, @WebParam(name = "nomArch") String nomArch) {
+        if (validadorInter()) {
+            return saiFuncionesService.condonacionMasiva(idusuario, nomArch);
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "generacionDePolizas")
+    public DTOGral generacionDePolizas(@WebParam(name = "idusuario") Integer idusuario, @WebParam(name = "esResumen") boolean esResumen, @WebParam(name = "concepto") String concepto, @WebParam(name = "nomArchivo") String nomArchivo, @WebParam(name = "fecha") String fecha) {
+        if (validadorInter()) {
+            return saiFuncionesService.generacionDePolizas(idusuario, esResumen, concepto, nomArchivo, fecha);
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "buscaPolizasPorFechaYUsuario")
+    public List<PolizasDTO> buscaPolizasPorFechaYUsuario(@WebParam(name = "fecha") Date fecha, @WebParam(name = "idusuario") int idusuario) {
+        if (validadorInter()) {
+            return polizasService.buscaPolizasDTOPorfechayusuario(fecha, idusuario);
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "ejecutaQuery")
+    public List<Object[]> ejecutaQuery(@WebParam(name = "query") String query) {
+        if (validadorInter()) {
+            return reportesService.ejecutaQuery(query);
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "buscarTabla")
+    public TablasDTO buscarTabla(@WebParam(name = "idtabla") String idtabla, @WebParam(name = "idelemento") String idelemento) {
+        if (validadorInter()) {
+            return tablasService.buscaTabla(idtabla, idelemento);
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "buscarTablasPorIdTabla")
+    public List<TablasDTO> buscarTablasPorIdTabla(@WebParam(name = "idtabla") String idtabla) {
+        if (validadorInter()) {
+            return tablasService.buscaTablasPorIdTabla(idtabla);
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "insertarTemporal")
+    public void insertarTemporal(
+            @WebParam(name = "sesion") String sesion,
+            @WebParam(name = "idorigenp") int idorigenp,
+            @WebParam(name = "idproducto") int idproducto,
+            @WebParam(name = "idauxiliar") int idauxiliar,
+            @WebParam(name = "idusuario") int idusuario,
+            @WebParam(name = "idorigen") int idorigen,
+            @WebParam(name = "idgrupo") int idgrupo,
+            @WebParam(name = "idsocio") int idsocio,
+            @WebParam(name = "esentrada") boolean esentrada,
+            @WebParam(name = "cuenta") String cuenta,
+            @WebParam(name = "acapital") double acapital,
+            @WebParam(name = "mov") int mov) {
+        if (validadorInter()) {
+            temporalService.insertaTemporal(sesion, idorigenp, idproducto, idauxiliar, idusuario, idorigen, idgrupo, idsocio, esentrada, cuenta, acapital, mov);
+        }
+    }
+
+    @WebMethod(operationName = "eliminaTemporal")
+    public void eliminaTemporal(
+            @WebParam(name = "sesion") String sesion,
+            @WebParam(name = "idorigenp") int idorigenp,
+            @WebParam(name = "idproducto") int idproducto,
+            @WebParam(name = "idauxiliar") int idauxiliar) {
+        if (validadorInter()) {
+            temporalService.eliminaTemporal(sesion, idorigenp, idproducto, idauxiliar);
+        }
+    }
+
+    @WebMethod(operationName = "buscaTemporalIdusuario")
+    public List<TemporalDTO> buscaTemporalIdusuario(@WebParam(name = "idusuario") int idusuario) {
+        if (validadorInter()) {
+            return temporalService.buscaTemporalIdusuario(idusuario);
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "actualizaTemporalHuella")
+    public void actualizaTemporalHuella(
+            @WebParam(name = "idusuario") int idusuario,
+            @WebParam(name = "idorigenp") int idorigenp,
+            @WebParam(name = "idproducto") int idproducto,
+            @WebParam(name = "idauxiliar") int idauxiliar,
+            @WebParam(name = "mov") int mov) {
+        if (validadorInter()) {
+            temporalService.actualizaTemporalHuella(idusuario, idorigenp, idproducto, idauxiliar, mov);
+        }
+    }
+
+    @WebMethod(operationName = "actualizaTemporalHuellaOGS")
+    public void actualizaTemporalHuellaOGS(
+            @WebParam(name = "idusuario") int idusuario,
+            @WebParam(name = "idorigen") int idorigen,
+            @WebParam(name = "idgrupo") int idgrupo,
+            @WebParam(name = "idsocio") int idsocio) {
+        if (validadorInter()) {
+            temporalService.actualizaTemporalHuellaOGS(idusuario, idorigen, idgrupo, idsocio);
+        }
+    }
+
+    @WebMethod(operationName = "buscaOrigenPorId")
+    public OrigenesDTO buscaOrigenPorId(@WebParam(name = "idorigen") int idorigen) {
+        if (validadorInter()) {
+            return origenesService.buscaOrigenes(idorigen);
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "buscaTodosLosOrigenes")
+    public List<OrigenesDTO> buscaTodosLosOrigenes() {
+        if (validadorInter()) {
+            return origenesService.buscaTodosLosOrigenes();
+        } else {
+            return null;
+        }
+
+    }
+
+    @WebMethod(operationName = "buscaIdsocioCola")
+    public HuellasColaGuardadoDTO buscaIdsocioCola(@WebParam(name = "idusuario") int idusuario) {
+        if (validadorInter()) {
+            return huellasColaGuardadoService.BuscaSocioPorIdusuario(idusuario);
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "eliminaHuellasColaGuardado")
+    public void eliminaHuellasColaGuardado(@WebParam(name = "idusuario") int idusuario) {
+        if (validadorInter()) {
+            huellasColaGuardadoService.eliminaHuellasColaGuardado(idusuario);
+        }
+    }
+
+    @WebMethod(operationName = "buscaTodosLosQueriesLibres")
+    public List<QueryDTO> buscaTodosLosQueriesLibres() {
+        if (validadorInter()) {
+            return querysService.buscaTodosLosQueriesLibres();
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "buscaQueryPorId")
+    public QueryDTO buscaQueryPorId(@WebParam(name = "idquery") int idquery) {
+        if (validadorInter()) {
+            return querysService.buscaQueryPorId(idquery);
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "eliminaQueryPorId")
+    public void eliminaQueryPorId(@WebParam(name = "idquery") int idquery) {
+        if (validadorInter()) {
+            querysService.eliminaQuery(idquery);
+        }
+    }
+
+    @WebMethod(operationName = "buscaProximoIdQuery")
+    public int buscaProximoIdQuery() {
+        if (validadorInter()) {
+            return querysService.buscaProximoIdQuery();
+        }
+        return 0;
+    }
+
+    @WebMethod(operationName = "insertaQuery")
+    public int insertaQuery(@WebParam(name = "idquery") int idquery,
+            @WebParam(name = "descripcion") String descripcion,
+            @WebParam(name = "query") String query,
+            @WebParam(name = "editable") boolean editable,
+            @WebParam(name = "remota") boolean remota) {
+        if (validadorInter()) {
+            return querysService.insertarQuery(idquery, descripcion, query, editable, remota);
+        } else {
+            return 0;
+        }
+    }
+
+    @WebMethod(operationName = "actualizaQuery")//este WebMethod actualiza con UpDate
+    public void actualizaQuery(@WebParam(name = "idquery") int idquery,
+            @WebParam(name = "descripcion") String descripcion,
+            @WebParam(name = "query") String query) {
+        if (validadorInter()) {
+            querysService.actualizaQuery(idquery, descripcion, query);
+        }
+    }
+
+    @WebMethod(operationName = "buscaQperfilesPorIdQuery")
+    public List<QperfilesDTO> buscaQperfilesPorIdQuery(@WebParam(name = "idquery") int idquery) {
+        if (validadorInter()) {
+            return qperfilesService.buscaQPerfilesPorIdQuery(idquery);
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "buscaQperfilesPorIdUgrupo")
+    public List<QperfilesDTO> buscaQperfilesPorIdUgrupo(@WebParam(name = "idugrupo") int idugrupo) {
+        if (validadorInter()) {
+            return qperfilesService.buscaQPerfilesPorIdugrupo(idugrupo);
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "buscaQPerfilesPor2Ids")
+    public QperfilesDTO buscaQPerfilesPor2Ids(@WebParam(name = "idquery") int idquery,
+            @WebParam(name = "idugrupo") int idugrupo) {
+        if (validadorInter()) {
+            return qperfilesService.buscaQPerfilesPor2Ids(idquery, idugrupo);
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "insertaQperfiles")
+    public void insertaQperfiles(@WebParam(name = "idquery") int idquery,
+            @WebParam(name = "idugrupo") int idugrupo) {
+        if (validadorInter()) {
+            qperfilesService.insertaQPerfiles(idquery, idugrupo);
+        }
+    }
+
+    @WebMethod(operationName = "eliminaQperfilesPor2ids")
+    public void eliminaQperfilesPor2ids(@WebParam(name = "idquery") int idquery,
+            @WebParam(name = "idugrupo") int idugrupo) {
+        if (validadorInter()) {
+            qperfilesService.eliminaQPerfiles(idquery, idugrupo);
+        }
+    }
+
+    @WebMethod(operationName = "eliminaQperfiles")
+    public void eliminaQperfiles(@WebParam(name = "idquery") int idquery) {
+        if (validadorInter()) {
+            qperfilesService.eliminaQPerfiles(idquery);
+        }
+    }
+
+    /**
+     *
+     *
+     *
+     *
+     * GENERAL*
+     *
+     *
+     *
+     *
+     */
+    @WebMethod(operationName = "buscaUgrupo")
+    public UgruposDTO buscaUgrupo(@WebParam(name = "idgrupo") int idgrupo) {
+        if (validadorInter()) {
+            return ugruposService.buscaUgrupo(idgrupo);
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "buscaTodosLosUgrupos")
+    public List<UgruposDTO> buscaTodosLosUgrupos() {
+        if (validadorInter()) {
+            return ugruposService.buscaTodosLosUgrupos();
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "buscarpermisosporIdUsuario")
+    public List<UsuariospermisosDTO> buscarpermisosporIdUsuario(@WebParam(name = "idusuario") int idusuario) {
+        if (validadorInter()) {
+            return usuariospermisosService.buscaPermisosporIdUsuario(idusuario);
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "buscaruGruposporIdUsuario")
+    public List<UsuariosugruposDTO> buscaruGruposporIdUsuario(@WebParam(name = "idusuario") int idusuario) {
+        if (validadorInter()) {
+            return usuariosugruposService.buscauGruposporIdUsuario(idusuario);
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "buscarUsuarioPorIdLogin")
+    public UsuariosDTO buscarUsuarioPorIdLogin(@WebParam(name = "idusuario") int idusuario) {
+        if (validadorInter()) {
+            UsuariosDTO usuariodto = usuariosService.buscaUsuarioPorId(idusuario);
+            session.putValue("idusuario", usuariodto.getIdusuario());
+            return usuariodto;
+        }
+        return null;
+    }
+
+    @WebMethod(operationName = "buscarUsuarioPorId")
+    public UsuariosDTO buscarUsuarioPorId(@WebParam(name = "idusuario") int idusuario) {
+        if (validadorInter()) {
+            UsuariosDTO usuariodto = usuariosService.buscaUsuarioPorId(idusuario);
+            return usuariodto;
+        }
+        return null;
+    }
+
+    @WebMethod(operationName = "actualizaPIngresoEnUsuario")
+    public void actualizaPIngresoEnUsuario(@WebParam(name = "idusuario") int idusuario, @WebParam(name = "pingreso") String pingreso) {
+        if (validadorInter()) {
+            usuariosService.actualizaPIngreso(idusuario, pingreso);
+        }
+    }
+
+    @WebMethod(operationName = "buscarProductoPorId")
+    public ProductosDTO buscarProductoPorId(@WebParam(name = "idproducto") int idproducto) {
+        if (validadorInter()) {
+            return productosService.buscaProductoPorId(idproducto);
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "buscarTodoHuellaUsuario")
+    public List<HuellasDpUsuarioDTO> buscarTodoHuellaUsuario(@WebParam(name = "formatohuella") int formatohuella) {
+        if (validadorInter()) {
+            return huellasDpUsuarioService.buscarTodoHuellaUsuario(formatohuella);
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "buscarHuellaUsuario")
+    public HuellasDpUsuarioDTO buscarHuellaUsuario(@WebParam(name = "idusuario") int idusuario,
+            @WebParam(name = "formatoHuella") int formatoHuella) {
+        if (validadorInter()) {
+            return huellasDpUsuarioService.buscaHuellaUsuario(idusuario, formatoHuella);
+        } else {
+            return null;
+        }
+    }
+
+    // --------------- gera ----------------------------------------------------
+    // Inserta o actualiza la huella del usuario
+    @WebMethod(operationName = "huellaDigitalUsuario")
+    public boolean huellaDigitalUsuario(
+            @WebParam(name = "esInserta") boolean esInserta,
+            @WebParam(name = "idusuarioIngreso") int idusuarioIngreso,
+            @WebParam(name = "idusuarioCapturo") int idusuarioCapturo,
+            @WebParam(name = "templateREG") List<byte[]> templateREG,
+            @WebParam(name = "templateVER") List<byte[]> templateVER) {
+        if (validadorInter()) {
+            return huellasDpUsuarioService.huellaDigitalUsuario(esInserta, idusuarioIngreso, idusuarioCapturo, templateREG, templateVER);
+        } else {
+            return false;
+        }
+    }
+
+    // Metodos para la huella
+    @WebMethod(operationName = "buscarHuellaPorSocio")
+    public HuellasDpDTO buscarHuellaPorSocio(@WebParam(name = "idorigen") int idorigen,
+            @WebParam(name = "idgrupo") int idgrupo,
+            @WebParam(name = "idsocio") int idsocio) {
+        if (validadorInter()) {
+            return huellasDpService.buscarHuellaPorSocio(idorigen, idgrupo, idsocio);
+        } else {
+            return null;
+        }
+    }
+
+    // Metodos para traer todas las huellas de los 
+    @WebMethod(operationName = "buscarTodasHuellasSocio")
+    public List<HuellasDpDTO> buscarTodasHuellasSocio(@WebParam(name = "limit") int limit,
+            @WebParam(name = "offset") int offset) {
+        if (validadorInter()) {
+            return huellasDpService.buscarTodasHuellasSocio(limit, offset);
+        } else {
+            return null;
+        }
+    }
+
+    // Metodos para traer todas las huellas de los 
+    @WebMethod(operationName = "buscarTodasHuellasSocioSinByte")
+    public List<HuellasDpDTO> buscarTodasHuellasSocioSinByte(@WebParam(name = "estatus") boolean estatus) {
+        if (validadorInter()) {
+            return huellasDpService.buscarTodasHuellasSocioSinByte(estatus);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     *
+     *
+     *
+     * SOCIO*
+     *
+     *
+     *
+     */
+    @WebMethod(operationName = "buscaAuxiliaresdDTOPorIdPoliza")
+    public List<AuxiliaresDDTO> buscaAuxiliaresdDTOPorIdPoliza(@WebParam(name = "idorigenc") int idorigenc, @WebParam(name = "periodo") String periodo, @WebParam(name = "idtipo") short idtipo, @WebParam(name = "idpoliza") int idpoliza) {
+        if (validadorInter()) {
+            return auxiliaresDService.buscaAuxiliaresdDTOPorIdPoliza(idorigenc, periodo, idtipo, idpoliza);
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "buscarAuxiliaresPorIds")
+    public List<AuxiliaresDTO> buscarAuxiliaresPorIds(@WebParam(name = "idorigen") int idorigen,
+            @WebParam(name = "idgrupo") int idgrupo,
+            @WebParam(name = "idsocio") int idsocio) {
+        if (validadorInter()) {
+            return auxiliaresService.buscaAuxiliaresPorIds(idorigen, idgrupo, idsocio);
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "buscaPersonasPorOrigen")
+    public List<PersonasDTO> buscaPersonasPorOrigen(@WebParam(name = "idorigen") int idorigen) {
+        if (validadorInter()) {
+            return personasService.buscaPersonasPorOrigen(idorigen);
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "buscaPersonasPorGrupo")
+    public List<PersonasDTO> buscaPersonasPorGrupo(@WebParam(name = "idgrupo") int idgrupo) {
+        if (validadorInter()) {
+            return personasService.buscaPersonasPorGrupo(idgrupo);
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "buscaPersona")
+    public PersonasDTO buscaPersona(@WebParam(name = "idorigen") int idorigen,
+            @WebParam(name = "idgrupo") int idgrupo,
+            @WebParam(name = "idsocio") int idsocio) {
+        if (validadorInter()) {
+            return personasService.buscaPersona(idorigen, idgrupo, idsocio);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     *
+     *
+     *
+     *
+     * CATALOGOS*
+     *
+     *
+     *
+     *
+     */
+    @WebMethod(operationName = "buscaFinalidadPorId")
+    public FinalidadesDTO buscaFinalidadPorId(@WebParam(name = "idfinalidad") int idfinalidad) {
+        if (validadorInter()) {
+            return finalidadesService.buscaFinalidadPorId(idfinalidad);
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "proximoIndiceFinalidades")
+    public int proximoIndiceFinalidades() {
+        if (validadorInter()) {
+            return finalidadesService.proximoIndiceFinalidades();
+        } else {
+            return 0;
+        }
+    }
+
+    @WebMethod(operationName = "buscaFinalidadesPorDependencia")
+    public List<FinalidadesDTO> buscaFinalidadesPorDependencia(@WebParam(name = "dependede") int dependede) {
+        if (validadorInter()) {
+            return finalidadesService.buscaFinalidadesPorDependencia(dependede);
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "buscaTodasLasFinalidades")
+    public List<FinalidadesDTO> buscaTodasLasFinalidades() {
+        if (validadorInter()) {
+            return finalidadesService.buscaTodasLasFinalidades();
+        } else {
+            return null;
+        }
+
+    }
+
+    @WebMethod(operationName = "guardarFinalidad")
+    public int guardarFinalidad(@WebParam(name = "idfinalidad") int idfinalidad, @WebParam(name = "descripcion") String descripcion, @WebParam(name = "dependede") int dependede, @WebParam(name = "clasif_contable_siti") long clasif_contable_siti) {
+        if (validadorInter()) {
+            return finalidadesService.guardarFinalidad(idfinalidad, descripcion, dependede, clasif_contable_siti);
+        } else {
+            return 0;
+        }
+    }
+
+    @WebMethod(operationName = "actualizarFinalidad")
+    public int actualizarFinalidad(@WebParam(name = "idfinalidad") int idfinalidad, @WebParam(name = "descripcion") String descripcion, @WebParam(name = "dependede") int dependede, @WebParam(name = "clasif_contable_siti") long clasif_contable_siti) {
+        if (validadorInter()) {
+            return finalidadesService.actualizarFinalidad(idfinalidad, descripcion, dependede, clasif_contable_siti);
+        } else {
+            return 0;
+        }
+    }
+
+    @WebMethod(operationName = "borrarFinalidad")
+    public int borrarFinalidad(@WebParam(name = "idfinalidad") int idfinalidad) {
+        if (validadorInter()) {
+            return finalidadesService.borrarFinalidad(idfinalidad);
+        } else {
+            return 0;
+        }
+    }
+
+    @WebMethod(operationName = "buscarTodosLosMunicipos")
+    public List<MunicipiosDTO> buscarTodosLosMunicipos() {
+        if (validadorInter()) {
+            return municipiosService.buscarTodosLosMunicipos();
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "buscarMunicipio")
+    public MunicipiosDTO buscarMunicipio(@WebParam(name = "idmunicipio") int idmunicipio) {
+        if (validadorInter()) {
+            return municipiosService.buscarMunicipio(idmunicipio);
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "buscarMunicipioPorEstado")
+    public List<MunicipiosDTO> buscarMunicipioPorEstado(@WebParam(name = "idestado") int idestado) {
+        if (validadorInter()) {
+            return municipiosService.buscarMunicipioPorEstado(idestado);
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "guardarmunicipio")
+    public int guardarmunicipio(@WebParam(name = "idmunicipio") int idmunicipio, @WebParam(name = "nombre") String nombre, @WebParam(name = "idestado") int idestado, @WebParam(name = "de_cp") String de_cp, @WebParam(name = "a_cp") String a_cp) {
+        if (validadorInter()) {
+            return municipiosService.guardarmunicipio(idmunicipio, nombre, idestado, de_cp, a_cp);
+        } else {
+            return 0;
+        }
+    }
+
+    @WebMethod(operationName = "actualizarMunicipio")
+    public int actualizarMunicipio(@WebParam(name = "idmunicipio") int idmunicipio, @WebParam(name = "nombre") String nombre, @WebParam(name = "idestado") int idestado, @WebParam(name = "de_cp") String de_cp, @WebParam(name = "a_cp") String a_cp) {
+        if (validadorInter()) {
+            return municipiosService.actualizarMunicipio(idmunicipio, nombre, idestado, de_cp, a_cp);
+        } else {
+            return 0;
+        }
+    }
+
+    @WebMethod(operationName = "borrarMunicipio")
+    public int borrarMunicipio(@WebParam(name = "idmunicipio") int idmunicipio) {
+        if (validadorInter()) {
+            return municipiosService.borrarMunicipio(idmunicipio);
+        } else {
+            return 0;
+        }
+    }
+
+    @WebMethod(operationName = "proximoIndiceMunicipios")
+    public int proximoIndiceMunicipios() {
+        if (validadorInter()) {
+            return municipiosService.proximoIndiceMunicipios();
+        } else {
+            return 0;
+        }
+    }
+
+    @WebMethod(operationName = "eliminarGrupo")
+    public int eliminarGrupo(@WebParam(name = "idgrupo") int idgrupo) {
+        if (validadorInter()) {
+            return gruposService.eliminarGrupo(idgrupo);
+        } else {
+            return 0;
+        }
+    }
+
+    @WebMethod(operationName = "guardarGrupo")
+    public int guardarGrupo(@WebParam(name = "idgrupo") int idgrupo, @WebParam(name = "nombre") String nombre, @WebParam(name = "tipogrupo") int tipogrupo) {
+        if (validadorInter()) {
+            return gruposService.guardarGrupo(idgrupo, nombre, tipogrupo);
+        } else {
+            return 0;
+        }
+    }
+
+    @WebMethod(operationName = "actualizaGrupo")
+    public int actualizaGrupo(@WebParam(name = "idgrupo") int idgrupo, @WebParam(name = "nombre") String nombre, @WebParam(name = "tipogrupo") int tipogrupo) {
+        if (validadorInter()) {
+            return gruposService.actualizaGrupo(idgrupo, nombre, tipogrupo);
+        } else {
+            return 0;
+        }
+    }
+
+    @WebMethod(operationName = "proximoIndiceGrupo")
+    public int proximoIndiceGrupo() {
+        if (validadorInter()) {
+            return gruposService.proximoIndiceGrupo();
+        } else {
+            return 0;
+        }
+    }
+
+    @WebMethod(operationName = "buscaGrupo")
+    public GruposDTO buscaGrupo(@WebParam(name = "idgrupo") int idgrupo) {
+        if (validadorInter()) {
+            return gruposService.buscaGrupo(idgrupo);
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "buscaTodosLosGrupos")
+    public List<GruposDTO> buscaTodosLosGrupos() {
+        if (validadorInter()) {
+            return gruposService.buscaTodosLosGrupos();
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "proximoIndiceSector")
+    public int proximoIndiceSector() {
+        if (validadorInter()) {
+            return sectoresService.proximoIndiceSectores();
+        } else {
+            return 0;
+        }
+
+    }
+
+    @WebMethod(operationName = "buscaSectorPoId")
+    public SectoresDTO buscaSectorPoId(@WebParam(name = "idsector") int idsector) {
+        if (validadorInter()) {
+            return sectoresService.buscaSectorPoId(idsector);
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "buscaTodosLosSectores")
+    public List<SectoresDTO> buscaTodosLosSectores() {
+        if (validadorInter()) {
+            return sectoresService.buscaTodosLosSectores();
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "guardarSector")
+    public int guardarSector(@WebParam(name = "idsector") int idsector, @WebParam(name = "nombre") String nombre) {
+        if (validadorInter()) {
+            return sectoresService.guardarSector(idsector, nombre);
+        } else {
+            return 0;
+        }
+    }
+
+    @WebMethod(operationName = "actualizarSector")
+    public int actualizarSector(@WebParam(name = "idsector") int idsector, @WebParam(name = "nombre") String nombre) {
+        if (validadorInter()) {
+            return sectoresService.actualizarSector(idsector, nombre);
+        } else {
+            return 0;
+        }
+
+    }
+
+    @WebMethod(operationName = "borrarSector")
+    public int borrarSector(@WebParam(name = "idsector") int idsector) {
+        if (validadorInter()) {
+            return sectoresService.borrarSector(idsector);
+        } else {
+            return 0;
+        }
+
+    }
+
+    @WebMethod(operationName = "buscaBancosPorId")
+    public BancosDTO buscaBancosPorId(@WebParam(name = "idfinalidad") int idfinalidad) {
+        if (validadorInter()) {
+            return bancosService.buscaBancosPorId(idfinalidad);
+        } else {
+            return null;
+        }
+
+    }
+
+    @WebMethod(operationName = "buscaTodosLosBancos")
+    public List<BancosDTO> buscaTodosLosBancos() {
+        if (validadorInter()) {
+            return bancosService.buscaTodosLosBancos();
+        } else {
+            return null;
+        }
+
+    }
+
+    @WebMethod(operationName = "proximoIndiceBancos")
+    public int proximoIndiceBancos() {
+        if (validadorInter()) {
+            return bancosService.proximoIndiceBancos();
+        } else {
+            return 0;
+        }
+
+    }
+
+    @WebMethod(operationName = "guardarBanco")
+    public int guardarBanco(@WebParam(name = "idbanco") int idbanco, @WebParam(name = "nombre") String nombre, @WebParam(name = "banco_receptor") String banco_receptor) {
+        if (validadorInter()) {
+            return bancosService.guardarBanco(idbanco, nombre, banco_receptor);
+        } else {
+            return 0;
+        }
+
+    }
+
+    @WebMethod(operationName = "actualizarBanco")
+    public int actualizarBanco(@WebParam(name = "idbanco") int idbanco, @WebParam(name = "nombre") String nombre, @WebParam(name = "banco_receptor") String banco_receptor) {
+        if (validadorInter()) {
+            return bancosService.actualizarBanco(idbanco, nombre, banco_receptor);
+        } else {
+            return 0;
+        }
+
+    }
+
+    @WebMethod(operationName = "borrarBanco")
+    public int borrarBanco(@WebParam(name = "idbanco") int idbanco) {
+        if (validadorInter()) {
+            return bancosService.borrarBanco(idbanco);
+        } else {
+            return 0;
+        }
+
+    }
+
+    @WebMethod(operationName = "buscaChequeraPorId")
+    public ChequerasDTO buscaChequeraPorId(@WebParam(name = "idchequera") int idchequera) {
+        if (validadorInter()) {
+            return chequerasService.buscaChequeraPorId(idchequera);
+        } else {
+            return null;
+        }
+
+    }
+
+    @WebMethod(operationName = "buscaTodasLasChequeras")
+    public List<ChequerasDTO> buscaTodasLasChequeras() {
+        if (validadorInter()) {
+            return chequerasService.buscaTodasLasChequeras();
+        } else {
+            return null;
+        }
+
+    }
+
+    @WebMethod(operationName = "proximoIndiceChequeras")
+    public int proximoIndiceChequeras() {
+        if (validadorInter()) {
+            return chequerasService.proximoIndiceChequeras();
+        } else {
+            return 0;
+        }
+
+    }
+
+    @WebMethod(operationName = "guardarChequera")
+    public int guardarChequera(@WebParam(name = "idchequera") int idchequera, @WebParam(name = "idbanco") int idbanco, @WebParam(name = "nombre") String nombre, @WebParam(name = "idcuenta") String idcuenta, @WebParam(name = "ultimocheque") int ultimocheque, @WebParam(name = "impresora") String impresora, @WebParam(name = "idorigen") int idorigen) {
+        if (validadorInter()) {
+            return chequerasService.guardarChequera(idchequera, idbanco, nombre, idcuenta, ultimocheque, impresora, idorigen);
+        } else {
+            return 0;
+        }
+
+    }
+
+    @WebMethod(operationName = "actualizarChequera")
+    public int actualizarChequera(@WebParam(name = "idchequera") int idchequera, @WebParam(name = "idbanco") int idbanco, @WebParam(name = "nombre") String nombre, @WebParam(name = "idcuenta") String idcuenta, @WebParam(name = "ultimocheque") int ultimocheque, @WebParam(name = "impresora") String impresora, @WebParam(name = "idorigen") int idorigen) {
+        if (validadorInter()) {
+            return chequerasService.actualizarChequera(idchequera, idbanco, nombre, idcuenta, ultimocheque, impresora, idorigen);
+        } else {
+            return 0;
+        }
+
+    }
+
+    @WebMethod(operationName = "borrarChequera")
+    public int borrarChequera(@WebParam(name = "idchequera") int idchequera) {
+        if (validadorInter()) {
+            return chequerasService.borrarChequera(idchequera);
+        } else {
+            return 0;
+        }
+
+    }
+
+    @WebMethod(operationName = "proximoIndiceColonias")
+    public int proximoIndiceColonias() {
+        if (validadorInter()) {
+            return coloniasService.proximoIndiceMunicipios();
+        } else {
+            return 0;
+        }
+    }
+
+    @WebMethod(operationName = "buscarTodasLasColonias")
+    public List<ColoniasDTO> buscarTodasLasColonias() {
+        if (validadorInter()) {
+            return coloniasService.buscarTodasLasColonias();
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "buscaColoniasPorMunicipio")
+    public List<ColoniasDTO> buscaColoniasPorMunicipio(@WebParam(name = "idmunicipio") int idmunicipio) {
+        if (validadorInter()) {
+            return coloniasService.buscaColoniasPorMunicipio(idmunicipio);
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "buscarColonia")
+    public ColoniasDTO buscarColonia(@WebParam(name = "idColonia") int idColonia) {
+        if (validadorInter()) {
+            return coloniasService.buscarColonia(idColonia);
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "guardarColonia")
+    public int guardarColonia(@WebParam(name = "idcolonia") int idcolonia, @WebParam(name = "nombre") String nombre, @WebParam(name = "idmunicipio") int idmunicipio, @WebParam(name = "codigopostal") String codigopostal) {
+        if (validadorInter()) {
+            return coloniasService.guardarColonia(idcolonia, nombre, idmunicipio, codigopostal);
+        } else {
+            return 0;
+        }
+    }
+
+    @WebMethod(operationName = "actualizarColonia")
+    public int actualizarColonia(@WebParam(name = "idcolonia") int idcolonia, @WebParam(name = "nombre") String nombre, @WebParam(name = "idmunicipio") int idmunicipio, @WebParam(name = "codigopostal") String codigopostal) {
+        if (validadorInter()) {
+            return coloniasService.actualizarColonia(idcolonia, nombre, idmunicipio, codigopostal);
+        } else {
+            return 0;
+        }
+    }
+
+    @WebMethod(operationName = "borrarColonia")
+    public int borrarColonia(@WebParam(name = "idcolonia") int idcolonia) {
+        if (validadorInter()) {
+            return coloniasService.borrarColonia(idcolonia);
+        } else {
+            return 0;
+        }
+    }
+
+    @WebMethod(operationName = "buscarTodosLosEstados")
+    public List<EstadosDTO> buscarTodosLosEstados() {
+        if (validadorInter()) {
+            return estadosService.buscarTodosLosEstados();
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "buscarEstado")
+    public EstadosDTO buscarEstado(@WebParam(name = "idestado") int idestado) {
+        if (validadorInter()) {
+            return estadosService.buscarEstado(idestado);
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "guardarEstado")
+    public int guardarEstado(@WebParam(name = "idestado") int idestado, @WebParam(name = "nombre") String nombre, @WebParam(name = "ef") String ef, @WebParam(name = "idpais") int idpais) {
+        if (validadorInter()) {
+            return estadosService.guardarEstado(idestado, nombre, ef, idpais);
+        } else {
+            return 0;
+        }
+    }
+
+    @WebMethod(operationName = "actualizarEstado")
+    public int actualizarEstado(@WebParam(name = "idestado") int idestado, @WebParam(name = "nombre") String nombre, @WebParam(name = "ef") String ef, @WebParam(name = "idpais") int idpais) {
+        if (validadorInter()) {
+            return estadosService.actualizarEstado(idestado, nombre, ef, idpais);
+        } else {
+            return 0;
+        }
+    }
+
+    @WebMethod(operationName = "borrarEstado")
+    public int borrarEstado(@WebParam(name = "idestado") int idestado) {
+        if (validadorInter()) {
+            return estadosService.borrarEstado(idestado);
+        } else {
+            return 0;
+        }
+    }
+    /**
+     *
+     *
+     *
+     * OTROS*
+     *
+     *
+     */
+    /**
+     * CONTROL DE SESSION*
+     */
+    @Resource
+    private WebServiceContext webServiceContext;
+    private HttpSession session;
+    private HttpServletRequest request;
+    private final List<HttpSession> sessions = new ArrayList<>(0);
+
+    //-- VALIDA EL USUARIO Y PASSWORD DE LA CABECERA DEL HTTP ------------------
+    private boolean validadorInter() {
+        MessageContext messageContext = webServiceContext.getMessageContext();
+        request = (HttpServletRequest) messageContext.get(MessageContext.SERVLET_REQUEST);
+        session = request.getSession();
+        Map http_headers = (Map) messageContext.get(MessageContext.HTTP_REQUEST_HEADERS);
+        List userList = (List) http_headers.get("USUARIO");
+        List passList = (List) http_headers.get("CONTRASENA");
+        String username = "";
+        String password = "";
+        if (userList != null && passList != null) {
+            // USUARIO Y CONTRASEÑA
+            username = userList.get(0).toString();
+            password = passList.get(0).toString();
+            //
+            List idSesionList = (List) http_headers.get("IDSESION");
+            List ipBaseDatosList = (List) http_headers.get("IPBASEDATOS");
+            List baseDatosList = (List) http_headers.get("BASEDATOS");
+            if (ipBaseDatosList != null && baseDatosList != null && idSesionList != null) {
+                datosConexion.setIp(ipBaseDatosList.get(0).toString());
+                datosConexion.setBd(baseDatosList.get(0).toString());
+                datosConexion.setIdSesion(idSesionList.get(0).toString());
+            }
+        }
+        return username.equals("usuario") && password.equals("contrasena");
+    }
+
+    // Verifica que la conexion a la base este activa
+    @WebMethod(operationName = "verificaConexionBaseDatos")
+    public boolean verificaConexionBaseDatos() {
+        return datosConexion.verificaEntityManager();
+    }
+
+    @WebMethod(operationName = "idSesion")
+    public String idSesion() {
+        return session.getId();
+    }
+
+    @WebMethod(operationName = "validaSesion")
+    public boolean validaSesion() {
+        if (validadorInter()) {
+            try {
+                String idusuario = session.getValue("idusuario").toString();
+                if (idusuario != null) {
+                    AdminSesionDTO sesion = adminSesionService.buscaAdminSesionPorUsuario(Integer.parseInt(idusuario));
+                    if (sesion.isEstatus()) {
+                        if (!sesion.getSesionservidor().equals(datosConexion.getIdSesion())) {
+                            return false;
+                        }
+                    }
+                    if (sesion.isBloqueado()) {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+            } catch (Exception e) {
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /*
+     este metodo lo que hace es cargar los datos en la sesion y genera el
+     formatFactory para meterlo dentro de la sesion
+     checa si existe en la lista de sesiones, si existe la remplaza y si no la guarda
+     envia el entityfactory a  datos conexion y despues checa que funcione correctamente.
+     */
+    /**
+     * Web service operation
+     *
+     */
+    @WebMethod(operationName = "datosCliente")
+    public Boolean datosCliente(@WebParam(name = "iplocal") String iplocal,
+            @WebParam(name = "ipExterna") String ipExterna,
+            @WebParam(name = "macAddress") String macAddress,
+            @WebParam(name = "ipBaseDatos") String ipBaseDatos,
+            @WebParam(name = "baseDatos") String baseDatos,
+            @WebParam(name = "usuarioSistemaOperativo") String usuarioSistemaOperativo,
+            @WebParam(name = "sistemaOperativo") String sistemaOperativo,
+            @WebParam(name = "versionSistemaOperativo") String versionSistemaOperativo,
+            @WebParam(name = "arquitecturaSistemaOperativo") String arquitecturaSistemaOperativo) {
+        boolean validaUsuarioPassword = validadorInter();
+        if (validaUsuarioPassword) {
+            try {
+                // Si es valida la sesion se agregan los datos del cliente.
+                session.putValue("iplocal", iplocal);
+                session.putValue("ipExterna", ipExterna);
+                session.putValue("macAddress", macAddress);
+                session.putValue("ipBaseDatos", ipBaseDatos);
+                session.putValue("baseDatos", baseDatos);
+                session.putValue("usuarioSistemaOperativo", usuarioSistemaOperativo);
+                session.putValue("sistemaOperativo", sistemaOperativo);
+                session.putValue("versionSistemaOperativo", versionSistemaOperativo);
+                session.putValue("arquitecturaSistemaOperativo", arquitecturaSistemaOperativo);
+                session.putValue("estado", Boolean.TRUE);
+            } catch (Exception e) {
+                System.out.println("Error: clase SAICoop, metodo conexion: " + e.getMessage());
+                return false;
+            }
+        }
+        return validaUsuarioPassword;
+    }
+
+    @WebMethod(operationName = "insertaSesion")
+    public Boolean insertaSesion(@WebParam(name = "idusuario") int idusuario) {
+        try {
+            if (validadorInter() && idusuario > 0) {
+                AdminSesionDTO adminSesion = adminSesionService.buscaAdminSesionPorUsuario(idusuario);
+                if (adminSesion.getIdusuario() == null) {
+                    if (adminSesionService.insertaAdminSesion(idusuario,
+                            datosConexion.getIdSesion(),
+                            session.getValue("iplocal").toString(),
+                            session.getValue("ipExterna").toString(),
+                            session.getValue("macAddress").toString(),
+                            session.getValue("ipBaseDatos").toString(),
+                            session.getValue("baseDatos").toString(),
+                            session.getValue("usuarioSistemaOperativo").toString(),
+                            session.getValue("sistemaOperativo").toString(),
+                            session.getValue("versionSistemaOperativo").toString(),
+                            session.getValue("arquitecturaSistemaOperativo").toString()) == 1) {
+                        return true;
+                    }
+                } else if (!adminSesion.isBloqueado() && adminSesion.getIdusuario() != null) {
+                    if (adminSesionService.actualizaAdminSesion(idusuario,
+                            datosConexion.getIdSesion(),
+                            session.getValue("iplocal").toString(),
+                            session.getValue("ipExterna").toString(),
+                            session.getValue("macAddress").toString(),
+                            session.getValue("ipBaseDatos").toString(),
+                            session.getValue("baseDatos").toString(),
+                            session.getValue("usuarioSistemaOperativo").toString(),
+                            session.getValue("sistemaOperativo").toString(),
+                            session.getValue("versionSistemaOperativo").toString(),
+                            session.getValue("arquitecturaSistemaOperativo").toString()) == 1) {
+                        return true;
+                    }
+                } else {
+                    return false;
+                }
+            }
+            return false;
+        } catch (Exception e) {
+            System.out.println("Error al insertar sesion. " + e.getMessage());
+            return false;
+        }
+    }
+
+    @WebMethod(operationName = "buscaSesionIdusuario")
+    public AdminSesionDTO buscaSesionIdusuario(@WebParam(name = "idusuario") int idusuario) {
+        if (validadorInter()) {
+            return adminSesionService.buscaAdminSesionPorUsuario(idusuario);
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "buscaSesionTodo")
+    public List<AdminSesionDTO> buscaSesionTodo() {
+        if (validadorInter()) {
+            return adminSesionService.buscaAdminSesionTodo();
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "actualizaAdminSesionEstatus")
+    public void actualizaAdminSesionEstatus(@WebParam(name = "idusuario") int idusuario,
+            @WebParam(name = "estatus") boolean estatus) {
+        if (validadorInter()) {
+            adminSesionService.actualizaAdminSesionEstatus(idusuario, estatus);
+        }
+    }
+
+    @WebMethod(operationName = "actualizaAdminSesionBloqueo")
+    public void actualizaAdminSesionBloqueo(@WebParam(name = "idusuario") int idusuario,
+            @WebParam(name = "estatus") boolean bloqueo) {
+        if (validadorInter()) {
+            adminSesionService.actualizaAdminSesionBloqueo(idusuario, bloqueo);
+        }
+    }
+
+    /*
+     este metodo cambia el estado de la sesion
+     por numero de sesion "id" y se le pasa el booleano del estado
+     */
+    @WebMethod(operationName = "tumbaSesion")
+    public void tumbaSesion(@WebParam(name = "numero") String numero,
+            @WebParam(name = "isValid") boolean isValid) {
+        if (validadorInter()) {
+            for (HttpSession session1 : sessions) {
+                if (session1.getId().equals(numero)) {
+                    session1.putValue("estado", isValid);
+                }
+            }
+        }
+    }
+
+    /*
+     este metodo remueve de la lista la sesion y despues la invalida
+     */
+    @WebMethod(operationName = "cierraSession")
+    public void cierraSession() {
+        if (validadorInter()) {
+            for (int i = 0; i < sessions.size(); i++) {
+                try {
+                    if (sessions.get(i).getId().equals(session.getId())) {
+                        sessions.remove(i);
+                        session.invalidate();
+                        break;
+                    }
+                } catch (Exception e) {
+                    System.out.println("Error al cerrar session: " + session.getId());
+                }
+            }
+        }
+    }
+
+    @WebMethod(operationName = "validador")
+    public boolean validador() {
+        return validadorInter();
+    }
+
+    @WebMethod(operationName = "ipCliente")
+    public String ipCliente() {
+        if (validadorInter()) {
+            return request.getRemoteAddr();
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "validaIp")
+    public boolean validaIP(@WebParam(name = "usuario") String usuario,
+            @WebParam(name = "ip") String ip,
+            @WebParam(name = "mac") String mac) {
+        if (validadorInter()) {
+            return new ListaIpValida().validaIP(usuario, ip, mac);
+        } else {
+            return false;
+        }
+    }
+    /*OTROS */
+
+    @WebMethod(operationName = "traeLista")
+    public List<String[]> traeLista() {
+        if (validadorInter()) {
+            return intermediario.traeLista();
+        } else {
+            return null;
+        }
+    }
+
+    @WebMethod(operationName = "getFile")
+    public byte[] getFile(@WebParam(name = "path") String path) {
+        if (validadorInter()) {
+            return intermediario.getFile(path);
+        } else {
+            return new byte[0];
+        }
+    }
+
+}
+
+/*
+ //------------------------------------------------------------------------------
+ //------------------ METODOS QUE POSIBLEMENTE SE PUEDEN USAR -------------------
+ //------------------------------------------------------------------------------
+
+ private void datosSesion() {
+ String scheme = request.getScheme();             // http
+ String serverName = request.getServerName();     // hostname.com
+ int serverPort = request.getServerPort();        // 80
+ String servletPath = request.getServletPath();   // /servlet/MyServlet
+ String pathInfo = request.getPathInfo();         // /a/b;c=123
+ String queryString = request.getQueryString();   // d=789
+ }
+
+
+ //------------------------------------------------------------------------------
+ */
